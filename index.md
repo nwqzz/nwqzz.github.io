@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <body>
-/*  <header> header </header> */
+<!--  <header> header </header> -->
   <nav> navbar </nav>
   <div id="sideNav" class="sidenav">
   <\div>
