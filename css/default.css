@@ -1,0 +1,56 @@
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  
+  .topnav {
+    overflow: hidden;
+    background-color: #555;
+  }
+  
+  .topnav a {
+    float: left;
+    color: #fff;
+    text-align: center;
+    padding: 15px 15px;
+    text-decoration: none;
+    font-size: 17px;
+  }
+  
+  .topnav a:hover {
+    background-color: #aaa;
+    color: black;
+  }
+  
+  .topnav a.active {
+    background-color: #f0f;
+    color: white;
+  }
+  
+  .sidenav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 15%;
+    background-color: #fff;
+    position: fixed;
+    height: 100%;
+    overflow: auto;
+  }
+  
+  .sidenav li a {
+    display: block;
+    color: #000;
+    padding: 8px 16px;
+    text-decoration: none;
+  }
+  
+  .sidenav li a.active {
+    background-color: #f0f;
+    color: white;
+  }
+  
+  .sidenav li a:hover:not(.active) {
+    background-color: #555;
+    color: white;
+  }
