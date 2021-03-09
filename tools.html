@@ -14,11 +14,98 @@
 	  </header>
     <div class="sidenav">
       <ul>
-        <li><a class="active" href="#home">Home</a></li>
-        <li><a href="#news">News</a></li>
-        <li><a href="#contact">Contact</a></li>
-        <li><a href="#about">About</a></li>
-      </ul>      
+        <li><a class="active" href="#timer">Timer</a></li>
+        <li><a href="#todo">todo</a></li>
+        <li><a href="#todo">todo</a></li>
+        <li><a href="#todo">todo</a></li>
+      </ul>
     </div>
+    <div class="main">
+      <div class="split left">
+        <p>content yarr</p>
+        <div class="timer" id=timer>
+          <input type="text" id="timerInput">
+          <button onclick="start()"> start </button>
+          
+        </div>
+          <div class="progressBar" id="progressBar">
+          </div>
+        </div>
+      <div class="split right">
+        <p>description</p>
+      </div>
+    </div>
+
+    <script>
+      function start() {
+      
+        let input = document.getElementById("timerInput").value;
+        
+        let i = parse(input); 
+        document.getElementById("timer").innerHTML = i;
+
+        /*
+        let x = setInterval(function(){
+          i++;
+          document.getElementById("timer").innerHTML = i;
+          let progressBar = document.getElementById("progressBar");
+          if(i<994){
+            progressBar.style.width = i/10 + "%";
+          }
+        }, 10);*/
+      }
+
+      function parse(input){
+
+        // remove all whitespace
+        input = input.replace(/\s/g,'');
+
+        // test if input only contains numbers
+        if(/^\d+$/.test(input)){
+          //interpret input as minutes
+          return input * 60000;
+        }
+        
+        // until specifies wheter the timer runs until a specified time (true) or for a specified timespan (false)
+        let until = false;
+        if(input.startsWith('at') || input.startsWith('until') || input.endsWith('um') || input.endsWith('bis') ||
+            input.endsWith('am') || input.endsWith('pm') || input.endsWith('Uhr') || input.endsWith('uhr')){
+          until = true;
+        }
+
+        // test if input format is '(hh:)mm:ss'
+        if(/^(\d+:)?\d{1,2}:\d{1,2}$/.test(input)){
+          
+          let split = input.split(':');
+          return convertTime(split);
+        }
+
+        // test if input is formated with hours, minutes, seconds, h, m, s or eqivalent
+        if(/^(\d+(h|hours))?\d{1,2}(m|min|minutes)\d{1,2}$/.test(input)){
+          
+          let split = input.match(/\d+/g);
+          return convertTime(split);
+        }
+      }
+
+      // receives an array containing (hours), minutes seconds; return timespan in milliseconds
+      function convertTime(split){
+        
+        //revert array and convert entries to Number
+        split.reverse();
+        split.map(Number);
+        
+        let secs = Number(split[0]);
+        let mins = Number(split[1]);
+        let hours = 0;
+        if(split[2]){
+          hours = Number(split[2]);
+        }
+        
+        return (hours * 3600 + mins*60 + secs) * 1000;
+
+      }
+    </script>
+
   </body>
 </html>
