@@ -6,12 +6,14 @@
     <link rel="stylesheet" href="./css/tools.css">
   </head>
   <body>
+
     <header class="topnav">
 	    <a href="./index.html">Home</a>
       <a class="active" href="./tools.html">Tools</a>
       <a href="./code_snippets.html">Code Snippets</a>
       <a href="./about.html">About</a>
 	  </header>
+
     <div class="sidenav">
       <ul>
         <li><a class="active" href="#timer">Timer</a></li>
@@ -20,19 +22,34 @@
         <li><a href="#todo">todo</a></li>
       </ul>
     </div>
+
     <div class="main">
+
       <div class="split left">
-        <p>content yarrr</p>
-        <div class="timer" id=timer>
-          <input type="text" id="timerInput">
+
+        <h4>Enter a time or timespan</h4>
+
+        <div class="timer" id=t1>
+          <input type="text" id="timerInput" value="1 minute 10 seconds">
           <button onclick="start()"> start </button>
-          
         </div>
-          <div class="progressBar" id="progressBar">
-          </div>
+
+        <div class="progressBar" id="pb1">
         </div>
-      <div class="split right">
-        <p>description</p>
+
+        <h4>or specify a time and date.</h4>
+
+        <div class="timer" id=t2>
+          <input type="datetime-local">
+          <button onclick="start()"> start </button>
+        </div>
+
+        <div class="progressBar" id="pb2">
+        </div>
+
+        <div class="split right">
+          <p>description</p>
+        </div>
       </div>
     </div>
 
@@ -42,7 +59,7 @@
         let input = document.getElementById("timerInput").value;
         
         let i = parse(input); 
-        document.getElementById("timer").innerHTML = i;
+        document.getElementById("t1").innerHTML = i;
 
         /*
         let x = setInterval(function(){
@@ -55,6 +72,7 @@
         }, 10);*/
       }
 
+      // converts text from the input field into a timespan, using regex
       function parse(input){
 
         // remove all whitespace
@@ -66,34 +84,78 @@
           return input * 60000;
         }
         
-        // until specifies wheter the timer runs until a specified time (true) or for a specified timespan (false)
-        let until = false;
-        if(input.startsWith('at') || input.startsWith('until') || input.endsWith('um') || input.endsWith('bis') ||
-            input.endsWith('am') || input.endsWith('pm') || input.endsWith('Uhr') || input.endsWith('uhr')){
-          until = true;
+        let until = false;        // until specifies whether the timer runs until a specified time (true) or for a specified timespan (false)
+        let pm = false;           // pm specifies whether the time is in the afternoon (true) or not (false)
+        let keyWords = ['at', 'until', 'um', 'bis', 'am', 'pm', 'Uhr', 'uhr'];
+        
+        keyWords.forEach(element => {
+          if(input.startsWith(element)||input.endsWith(element)){
+            until = true;
+          }
+        });
+        
+        if(input.endsWith(pm)){
+            pm = true;
         }
+        
+        keyWords.forEach(element => {
+          input.replace(element, '');
+        });
 
         // test if input format is '(hh:)mm:ss'
         if(/^(\d+:)?\d{1,2}:\d{1,2}$/.test(input)){
           
           let split = input.split(':');
-          return convertTime(split);
+          if(until){
+            return convertDateTime(split);
+          }
+          return convertTimespan(split);
         }
 
-        // test if input is formated with hours, minutes, seconds, h, m, s or eqivalent
-        if(/^(\d+(h|hours))?\d{1,2}(m|min|minutes)\d{1,2}$/.test(input)){
+        // test if input is formated with hours, minutes, seconds, h, m, s or equivalent
+        //    (h  hours          mm     minutes             ss     seconds)
+        if(/^(\d+(h|hour(s)?))?(\d{1,2}(m|min|minute(s)?))?(\d{1,2}(s|sec|second(s)?))?$/.test(input)){
           
-          let split = input.match(/\d+/g);
-          return convertTime(split);
+          //the following code checks whether hours minutes or seconds are used and prepares the split array for timespan conversion
+          let hasHours = false;
+          let hasMinutes = false;
+          let hasSeconds = false;
+
+          if(/(h|hour(s)?)/.test(input)){
+            hasHours = true;
+            input = input.replace(/(hour(s)?|h)/,':');
+          }
+
+          if(/(m|min|minute(s)?)/.test(input)){
+            hasMinutes = true;
+            input = input.replace(/(minute(s)?|min|m)/,':');
+          }
+          
+          if(/(s|sec|second(s)?)/.test(input)){
+            hasSeconds = true;
+            input = input.replace(/(second(s)?|sec|s)/,'');
+          }
+          
+          let split = input.split(':');
+          if(!hasMinutes && hasSeconds){
+            split[2]= split[1];
+            split[1] = '00';
+          }else{
+
+          }
+          if(!hasSeconds){
+            split[2] = 00;
+          }
+
+          console.log(split);
+          return convertTimespan(split);
         }
       }
 
       // receives an array containing (hours), minutes seconds; return timespan in milliseconds
-      function convertTime(split){
+      function convertTimespan(split){
         
-        //revert array and convert entries to Number
         split.reverse();
-        split.map(Number);
         
         let secs = Number(split[0]);
         let mins = Number(split[1]);

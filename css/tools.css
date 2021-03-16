@@ -25,3 +25,8 @@
   p {
     margin: 15px;
   }
+
+  h4 {
+    padding-left: 10px;
+    text-align: left;
+  }
