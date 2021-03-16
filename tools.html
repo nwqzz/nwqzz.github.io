@@ -93,21 +93,33 @@
             until = true;
           }
         });
-        
+
         if(input.endsWith(pm)){
             pm = true;
         }
         
         keyWords.forEach(element => {
-          input.replace(element, '');
+          input = input.replace(element, '');
         });
 
         // test if input format is '(hh:)mm:ss'
         if(/^(\d+:)?\d{1,2}:\d{1,2}$/.test(input)){
           
           let split = input.split(':');
+          
           if(until){
-            return convertDateTime(split);
+            if(!split[2]){
+              split[2] = 0;
+            }
+            let timeOfDay = convertTimespan(split);
+            let todaysDate = new Date();
+            todaysDate.setHours(0,0,0,0);
+            console.log(todaysDate.getTime());
+            console.log(timeOfDay)
+            let endTime = new Date();
+            endTime.setTime(todaysDate.getTime()+timeOfDay);
+            console.log(endTime);
+            return endTime;
           }
           return convertTimespan(split);
         }
@@ -116,6 +128,15 @@
         //    (h  hours          mm     minutes             ss     seconds)
         if(/^(\d+(h|hour(s)?))?(\d{1,2}(m|min|minute(s)?))?(\d{1,2}(s|sec|second(s)?))?$/.test(input)){
           
+          split = parseWordInput(input);
+
+          return convertTimespan(split);
+        }
+      }
+
+      // takes string input in the form of hh hours mm minutes ss seconds
+      function parseWordInput(input){
+
           //the following code checks whether hours minutes or seconds are used and prepares the split array for timespan conversion
           let hasHours = false;
           let hasMinutes = false;
@@ -147,9 +168,7 @@
             split[2] = 00;
           }
 
-          console.log(split);
-          return convertTimespan(split);
-        }
+          return split;
       }
 
       // receives an array containing (hours), minutes seconds; return timespan in milliseconds
@@ -167,6 +186,18 @@
         return (hours * 3600 + mins*60 + secs) * 1000;
 
       }
+
+      function convertDateTime(input, pm){
+        
+        console.log(input);
+        let endtime = new Date();
+
+        
+        start.setHours(split);
+
+
+      }
+
     </script>
 
   </body>
