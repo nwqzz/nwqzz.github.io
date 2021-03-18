@@ -29,10 +29,13 @@
 
         <h4>Enter a time or timespan</h4>
 
-        <div class="timer" id=t1>
-          <input type="text" id="timerInput" value="1 minute 10 seconds">
-          <button onclick="start()"> start </button>
-        </div>
+        <div>
+          <div class="timer" id=t1>
+            <input type="text" id="timerInput" value="1 minute 10 seconds">
+            <button onclick="start()"> start </button>
+          </div>
+          <span id="asdf"></span>
+        </span>
 
         <div class="progressBar" id="pb1">
         </div>
@@ -54,22 +57,80 @@
     </div>
 
     <script>
+
+      
+      let running = false;
+
       function start() {
       
-        let input = document.getElementById("timerInput").value;
-        
-        let i = parse(input); 
-        document.getElementById("t1").innerHTML = i;
+        running = true;
+        let resetButton = '<button onclick="reset()" style=\'float: right;\'> reset </button>';
+        document.getElementById('asdf').innerHTML =  resetButton;
 
-        /*
+        let input = document.getElementById("timerInput").value;
+
+        
+        let timeSpan = parse(input); 
+        let startTime = new Date();
+        let endTime = new Date(startTime.getTime()+timeSpan) ;
+
         let x = setInterval(function(){
-          i++;
-          document.getElementById("timer").innerHTML = i;
-          let progressBar = document.getElementById("progressBar");
-          if(i<994){
-            progressBar.style.width = i/10 + "%";
+
+          if(!running){
+            clearInterval(x);
+            //TODO fix this
+            resetHtml = '\<div class="timer" id=t1\>\
+                           \<input type="text" id="timerInput" value="1 minute 10 seconds"\>\
+                           \<button onclick="start()"> start </button\>\
+                         \</div\>\
+                         \<span id="asdf"></span\>';
+            document.getElementById("t1").innerHTML = (resetHtml);
           }
-        }, 10);*/
+
+          let now = new Date();
+          let countDown = endTime - now;
+
+          if(countDown < 0){
+            running = false;
+            document.getElementById("t1").innerHTML = ('staaap');
+            return;
+          }
+
+          let seconds = Math.floor((countDown % (1000 * 60)) / 1000);
+          let minutes = Math.floor((countDown % (1000 * 60 * 60)) / (1000 * 60));
+          let hours = Math.floor((countDown % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          let days = Math.floor(countDown / (1000 * 60 * 60 * 24));
+
+          let countDownText = '';
+
+          // check and only output days hours and minutes if applicable
+          if(days){
+            countDownText += days + ' days ';
+            countDownText += hours + ' hours ';
+            countDownText += minutes + ' minutes ';
+          }else{
+            if(hours){
+            countDownText += hours + ' hours ';
+            countDownText += minutes + ' minutes ';
+            }else{
+              if(minutes){
+                countDownText += minutes + ' minutes ';
+              }
+            }
+          }
+          countDownText += seconds + ' seconds ';
+
+          document.getElementById("t1").innerHTML = (countDownText);
+
+          let progressBarWidth = ((now.getTime() - startTime.getTime())/(timeSpan)*100).toFixed(2)+ "%"
+          let progressBar = document.getElementById("pb1");
+          progressBar.style.width = progressBarWidth;
+        
+        }, 10);
+      }
+
+      function reset(){
+        running = false;
       }
 
       // converts text from the input field into a timespan, using regex
@@ -84,17 +145,18 @@
           return input * 60000;
         }
         
-        let until = false;        // until specifies whether the timer runs until a specified time (true) or for a specified timespan (false)
-        let pm = false;           // pm specifies whether the time is in the afternoon (true) or not (false)
-        let keyWords = ['at', 'until', 'um', 'bis', 'am', 'pm', 'Uhr', 'uhr'];
+        let until = false;  // specifies whether the timer runs until a specified time (true) or for a specified timespan (false)
         
+        // check for keywords that imply a specified endtime
+        let keyWords = ['at', 'until', 'um', 'bis', 'am', 'pm', 'Uhr', 'uhr'];
         keyWords.forEach(element => {
           if(input.startsWith(element)||input.endsWith(element)){
             until = true;
           }
         });
 
-        if(input.endsWith(pm)){
+        let pm = false; // pm specifies whether the time is in the afternoon, i.e. +12 hours
+        if(input.endsWith('pm')){
             pm = true;
         }
         
@@ -106,20 +168,35 @@
         if(/^(\d+:)?\d{1,2}:\d{1,2}$/.test(input)){
           
           let split = input.split(':');
-          
+
+          // treat the entered string as an endtime and calculate the timespan from now to then
           if(until){
+            
+            // filling in seconds value with 0 if it is not set
             if(!split[2]){
               split[2] = 0;
             }
-            let timeOfDay = convertTimespan(split);
-            let todaysDate = new Date();
+
+            let timeOfDay = convertTimespan(split); // the number of milliseconds between the entered time and 00:00 am
+            
+            let todaysDate = new Date();            // the time and date at 00:00 am today
             todaysDate.setHours(0,0,0,0);
-            console.log(todaysDate.getTime());
-            console.log(timeOfDay)
-            let endTime = new Date();
+            
+            let endTime = new Date();               // a Date object with todays date and the time from the input field 
             endTime.setTime(todaysDate.getTime()+timeOfDay);
-            console.log(endTime);
-            return endTime;
+            
+            // add 12 hours is the time is 'pm'
+            if(pm){
+              endTime.setHours(endTime.getHours()+12);
+            }
+            
+            // if the time entered is already in the past, adjust endtime to the following day
+            if(endTime - new Date()<0){
+              endTime.setDate(endTime.getDate()+1)
+            }
+            
+
+            return endTime - new Date();
           }
           return convertTimespan(split);
         }
@@ -129,7 +206,7 @@
         if(/^(\d+(h|hour(s)?))?(\d{1,2}(m|min|minute(s)?))?(\d{1,2}(s|sec|second(s)?))?$/.test(input)){
           
           split = parseWordInput(input);
-
+          console.log(split);
           return convertTimespan(split);
         }
       }
@@ -158,7 +235,7 @@
           }
           
           let split = input.split(':');
-          if(!hasMinutes && hasSeconds){
+          if(hasHours && !hasMinutes && hasSeconds){
             split[2]= split[1];
             split[1] = '00';
           }else{
@@ -171,13 +248,17 @@
           return split;
       }
 
-      // receives an array containing (hours), minutes seconds; return timespan in milliseconds
+      // receives an array containing (hours) (minutes) seconds; return timespan in milliseconds
       function convertTimespan(split){
         
         split.reverse();
         
         let secs = Number(split[0]);
-        let mins = Number(split[1]);
+        
+        let mins = 0;
+        if(split[1]){
+          mins = Number(split[1]);
+        }
         let hours = 0;
         if(split[2]){
           hours = Number(split[2]);

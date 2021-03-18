@@ -30,3 +30,10 @@
     padding-left: 10px;
     text-align: left;
   }
+  
+  button {
+    background-color: #599;
+    border: none;
+    color: white;
+    padding: 3px 15px; 
+  }
