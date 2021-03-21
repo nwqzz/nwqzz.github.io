@@ -30,11 +30,13 @@
         <h4>Enter a time or timespan</h4>
 
         <div>
-          <div class="timer" id=t1>
-            <input type="text" id="timerInput" value="1 minute 10 seconds">
-            <button onclick="start()"> start </button>
-          </div>
+          <div class="timer" >
+            <span id=t1>
+              <input type="text" id="timerInput" value="1 minute 10 seconds">
+              <button onclick="start()"> start </button>
+            </span>
           <span id="asdf"></span>
+          </div>
         </span>
 
         <div class="progressBar" id="pb1">
@@ -60,6 +62,7 @@
 
       
       let running = false;
+      let isReset = false;
 
       function start() {
       
@@ -78,13 +81,12 @@
 
           if(!running){
             clearInterval(x);
-            //TODO fix this
-            resetHtml = '\<div class="timer" id=t1\>\
-                           \<input type="text" id="timerInput" value="1 minute 10 seconds"\>\
-                           \<button onclick="start()"> start </button\>\
-                         \</div\>\
-                         \<span id="asdf"></span\>';
-            document.getElementById("t1").innerHTML = (resetHtml);
+          }
+          if(isReset){
+            
+            resetHtml = '<input type="text" id="timerInput" value="1 minute 10 seconds"><button onclick="start()"> start </button>';
+            document.getElementById("t1").innerHTML = resetHtml;
+            return;
           }
 
           let now = new Date();
@@ -92,7 +94,7 @@
 
           if(countDown < 0){
             running = false;
-            document.getElementById("t1").innerHTML = ('staaap');
+            document.getElementById("t1").innerHTML = 'staaap';
             return;
           }
 
@@ -131,6 +133,7 @@
 
       function reset(){
         running = false;
+        isReset = true;
       }
 
       // converts text from the input field into a timespan, using regex
