@@ -8,7 +8,7 @@
     color: white;
   }
 
-  .timer {
+  .timerEnd, .timerSpan {
     border-style: solid;
     border-color: #999;
     margin: 3px;

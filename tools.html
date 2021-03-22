@@ -25,17 +25,20 @@
 
     <div class="main">
 
-      <div class="split left">
+      <div class="split left"> 
+        <!-- TODO add button for additional timers -->
+        <!-- TODO adjustable names for timers -->
+        <!-- TODO change progress bar color when finished -->
 
         <h4>Enter a time or timespan</h4>
 
         <div>
-          <div class="timer" >
+          <div class="timerSpan" >
             <span id=timer1>
               <input type="text" id="timerInput1" value="1 minute 10 seconds">
               <button onclick="start(1)"> start </button>
             </span>
-          <span id="resetFrame"></span>
+          <span id="resetFrame1"></span>
           </div>
         </span>
 
@@ -44,11 +47,12 @@
 
         <h4>or specify a time and date.</h4>
 
-        <div class="timer">
+        <div class="timerEnd">
           <span id=timer2>
-            <input type="datetime-local" id='timerInput2' value=now>
+            <input type="datetime-local" id='timerInput2'>
             <button onclick="start(2)"> start </button>
           </span>
+          <span id="resetFrame2"></span>
         </div>
 
         <div class="progressBar" id="progressBar2">
@@ -64,16 +68,14 @@
 
       // add timer Object make all statuses and methods object dependent
       
-      let running = false;
-      let isReset = false;
+      let stop = '';
+      let isReset = '';
 
       function start(timer) {
-      
-        running = true;
         
         // display reset button
-        let resetButton = '<button onclick="reset()" style=\'float: right;\'> reset </button>';
-        document.getElementById('resetFrame').innerHTML =  resetButton;
+        let resetButton = '<button onclick="reset('+ timer +')" style=\'float: right;\'> reset </button>';
+        document.getElementById('resetFrame'+timer).innerHTML =  resetButton;
 
         // read the relevant input field
         let input = document.getElementById("timerInput"+timer).value;
@@ -84,16 +86,20 @@
 
         let x = setInterval(function(){
 
-          if(!running){
+          if(stop == timer){
             clearInterval(x);
           }
-          if(isReset){
-            
-            resetHtml = '<input type="text" id="timerInput1" value="1 minute 10 seconds"><button onclick="start()"> start </button>';
+          if(isReset == timer){
+            if(document.getElementById("timer"+timer).parentNode.className == 'timerSpan'){
+              resetHtml = '<input type="text" id="timerInput'+timer+'" value="1 minute 10 seconds"><button onclick="start('+timer+')"> start </button>'; //TODO: change reset input to last input
+            }else{
+              resetHtml = '<input type="datetime-local" id="timerInput'+ timer +'"><button onclick="start('+timer+')"> start </button>';
+            }
             document.getElementById("timer"+timer).innerHTML = resetHtml;
             document.getElementById("progressBar"+timer).style.width = 0;
-            running = false;
-            isReset = false;
+            document.getElementById("resetFrame"+timer).innerHTML = '';
+            stop = '';
+            isReset = '';
             return;
           }
 
@@ -147,16 +153,14 @@
         }, 10);
       }
 
-      function reset(){
-        running = false;
-        isReset = true;
+      function reset(timer){
+        stop = timer;
+        isReset = timer;
       }
 
       // converts text from the input field into a timespan, using regex
       function parse(input){
-
         
-        console.log(input)
         // check if input is in default format (from date picker)
         if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(input)){
           // return distance between chosen time and now in milliseconds
@@ -193,7 +197,7 @@
         });
 
         // test if input format is '(hh:)mm:ss'
-        if(/^(\d+:)?\d{1,2}:\d{1,2}$/.test(input)){
+        if(/^(\d+:)?(\d{1,2}:)?\d{1,2}$/.test(input)){
           
           let split = input.split(':');
 
@@ -204,9 +208,12 @@
             if(!split[2]){
               split[2] = 0;
             }
+            if(!split[1]){
+              split[1] = 0;
+            }
 
             let timeOfDay = convertTimespan(split); // the number of milliseconds between the entered time and 00:00 am
-            
+
             let todaysDate = new Date();            // the time and date at 00:00 am today
             todaysDate.setHours(0,0,0,0);
             
@@ -293,17 +300,6 @@
         }
         
         return (hours * 3600 + mins*60 + secs) * 1000;
-
-      }
-
-      function convertDateTime(input, pm){
-        
-        console.log(input);
-        let endtime = new Date();
-
-        
-        start.setHours(split);
-
 
       }
 
