@@ -31,25 +31,27 @@
 
         <div>
           <div class="timer" >
-            <span id=t1>
-              <input type="text" id="timerInput" value="1 minute 10 seconds">
-              <button onclick="start()"> start </button>
+            <span id=timer1>
+              <input type="text" id="timerInput1" value="1 minute 10 seconds">
+              <button onclick="start(1)"> start </button>
             </span>
-          <span id="asdf"></span>
+          <span id="resetFrame"></span>
           </div>
         </span>
 
-        <div class="progressBar" id="pb1">
+        <div class="progressBar" id="progressBar1">
         </div>
 
         <h4>or specify a time and date.</h4>
 
-        <div class="timer" id=t2>
-          <input type="datetime-local">
-          <button onclick="start()"> start </button>
+        <div class="timer">
+          <span id=timer2>
+            <input type="datetime-local" id='timerInput2' value=now>
+            <button onclick="start(2)"> start </button>
+          </span>
         </div>
 
-        <div class="progressBar" id="pb2">
+        <div class="progressBar" id="progressBar2">
         </div>
 
         <div class="split right">
@@ -60,19 +62,22 @@
 
     <script>
 
+      // add timer Object make all statuses and methods object dependent
       
       let running = false;
       let isReset = false;
 
-      function start() {
+      function start(timer) {
       
         running = true;
-        let resetButton = '<button onclick="reset()" style=\'float: right;\'> reset </button>';
-        document.getElementById('asdf').innerHTML =  resetButton;
-
-        let input = document.getElementById("timerInput").value;
-
         
+        // display reset button
+        let resetButton = '<button onclick="reset()" style=\'float: right;\'> reset </button>';
+        document.getElementById('resetFrame').innerHTML =  resetButton;
+
+        // read the relevant input field
+        let input = document.getElementById("timerInput"+timer).value;
+
         let timeSpan = parse(input); 
         let startTime = new Date();
         let endTime = new Date(startTime.getTime()+timeSpan) ;
@@ -84,18 +89,21 @@
           }
           if(isReset){
             
-            resetHtml = '<input type="text" id="timerInput" value="1 minute 10 seconds"><button onclick="start()"> start </button>';
-            document.getElementById("t1").innerHTML = resetHtml;
+            resetHtml = '<input type="text" id="timerInput1" value="1 minute 10 seconds"><button onclick="start()"> start </button>';
+            document.getElementById("timer"+timer).innerHTML = resetHtml;
+            document.getElementById("progressBar"+timer).style.width = 0;
+            running = false;
+            isReset = false;
             return;
           }
 
           let now = new Date();
           let countDown = endTime - now;
 
-          if(countDown < 0){
-            running = false;
-            document.getElementById("t1").innerHTML = 'staaap';
-            return;
+          let timerEnded = false;
+          if(countDown<0){
+            timerEnded = true;
+            countDown *= -1;
           }
 
           let seconds = Math.floor((countDown % (1000 * 60)) / 1000);
@@ -104,6 +112,8 @@
           let days = Math.floor(countDown / (1000 * 60 * 60 * 24));
 
           let countDownText = '';
+
+
 
           // check and only output days hours and minutes if applicable
           if(days){
@@ -122,11 +132,17 @@
           }
           countDownText += seconds + ' seconds ';
 
-          document.getElementById("t1").innerHTML = (countDownText);
+          // changed output if timer has run out
+          if(timerEnded){
+            document.getElementById("timer"+timer).innerHTML = 'Timer ended '+countDownText+' ago! ';
+            return;
+          }
 
+          document.getElementById("timer"+timer).innerHTML = (countDownText);
+
+          // calculate and set the progress bar width
           let progressBarWidth = ((now.getTime() - startTime.getTime())/(timeSpan)*100).toFixed(2)+ "%"
-          let progressBar = document.getElementById("pb1");
-          progressBar.style.width = progressBarWidth;
+          document.getElementById("progressBar"+timer).style.width = progressBarWidth;
         
         }, 10);
       }
@@ -139,11 +155,20 @@
       // converts text from the input field into a timespan, using regex
       function parse(input){
 
+        
+        console.log(input)
+        // check if input is in default format (from date picker)
+        if(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(input)){
+          // return distance between chosen time and now in milliseconds
+          return new Date(input) - new Date();
+        }
+
         // remove all whitespace
         input = input.replace(/\s/g,'');
 
         // test if input only contains numbers
         if(/^\d+$/.test(input)){
+
           //interpret input as minutes
           return input * 60000;
         }
@@ -198,9 +223,10 @@
               endTime.setDate(endTime.getDate()+1)
             }
             
-
+            // return the distance between the specified end time and now
             return endTime - new Date();
           }
+
           return convertTimespan(split);
         }
 
@@ -209,7 +235,6 @@
         if(/^(\d+(h|hour(s)?))?(\d{1,2}(m|min|minute(s)?))?(\d{1,2}(s|sec|second(s)?))?$/.test(input)){
           
           split = parseWordInput(input);
-          console.log(split);
           return convertTimespan(split);
         }
       }
