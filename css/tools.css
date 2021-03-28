@@ -20,6 +20,19 @@
     width: 0%;
     padding-top: 30px;
     margin: 3px;
+    margin-top: 15px;
+  }
+
+  .flashing {
+    animation-name: flashRed;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+  }
+
+  @keyframes flashRed {
+    0%   {background-color: #599;}
+    50% {background-color: #b44;}
+    100% {background-color: #599;}
   }
 
   p {
@@ -36,4 +49,25 @@
     border: none;
     color: white;
     padding: 3px 15px; 
+  }
+
+  .addButton {
+    font-size: 20pt;
+    background-color: #999;
+    margin-left: .5em;
+    margin-top: .2em;
+  }
+
+  .removeButton {
+    font-size: 16pt;
+    background-color: rgba(0,0,0,0);
+    float:right;
+    outline: none;
+    padding: 0,0;
+    margin: -15px -15px;
+
+  }
+
+  .resetButton {
+    float: left;
   }
