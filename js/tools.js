@@ -1,8 +1,8 @@
       // add timer Object make all statuses and methods object dependent
       
-      let stop = '';
-      let isReset = '';
-      let numTimers = 2; // number of active timers
+      let stop = '';      // stores the id of the timer that is beeing stopped
+      let isReset = '';   // stores the id of the timer that is beeing reset
+      let numTimers = 2;  // stores the number of timer ids that are used up
 
       function start(timer) {
         
@@ -19,12 +19,16 @@
         let endTime = new Date(startTime.getTime()+timeSpan) ;
         let timerEnded = false;
 
+
         let x = setInterval(function(){
 
+          // stop the interval function if a given timer is stopped
           if(stop == timer){
             clearInterval(x);
           }
-          if(isReset == timer){
+
+          // reset the given timerSpan or timerEnd divs of a specified timer
+          if(isReset == timer && document.getElementById("timer"+timer)){
             if(document.getElementById("timer"+timer).parentNode.className == 'timerSpan'){
               resetHtml = '<input type="text" id="timerInput'+timer+'" value="'+input+'"><button onclick="start('+timer+')"> start </button>'; 
             }else{
@@ -32,9 +36,13 @@
             }
             resetHtml += '<button class="removeButton" onclick="removeButton('+(timer)+')">🗙</button>';
             document.getElementById("timer"+timer).innerHTML = resetHtml;
+            
+            // reset progressbar and remove reset button
             document.getElementById("progressBar"+timer).classList.remove("flashing");
             document.getElementById("progressBar"+timer).style.width = 0;
             document.getElementById("resetFrame"+timer).innerHTML = '';
+            
+            // clear stop and reset variables and exit the inteval function
             stop = '';
             isReset = '';
             return;
@@ -43,6 +51,7 @@
           let now = new Date();
           let countDown = endTime - now;
 
+          // animate the progressbar and play an alarm tone when the timer has finished
           if(countDown<0){
             if(!timerEnded){
               document.getElementById("progressBar"+timer).classList.add("flashing");
@@ -51,19 +60,18 @@
               setTimeout(beep,1000);
             }
             
+            // change countDown to time since the timer has ended in millis
             countDown *= -1;
             timerEnded = true;
           }
 
+          // compute seconds minutes hours and days from millis in countDown variable
           let seconds = Math.floor((countDown % (1000 * 60)) / 1000);
           let minutes = Math.floor((countDown % (1000 * 60 * 60)) / (1000 * 60));
           let hours = Math.floor((countDown % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
           let days = Math.floor(countDown / (1000 * 60 * 60 * 24));
 
           let countDownText = '';
-
-
-
           // check and only output days hours and minutes if applicable
           if(days){
             countDownText += days + ' days ';
@@ -86,6 +94,7 @@
             document.getElementById("timer"+timer).innerHTML = 'Timer ended '+countDownText+' ago! ';
             return;
           }
+
 
           document.getElementById("timer"+timer).innerHTML = (countDownText);
 
@@ -192,6 +201,7 @@
           let hasMinutes = false;
           let hasSeconds = false;
 
+          // check if hours minutes and seconds are part of the input and replace them with ':'
           if(/(h|hour(s)?)/.test(input)){
             hasHours = true;
             input = input.replace(/(hour(s)?|h)/,':');
@@ -207,13 +217,14 @@
             input = input.replace(/(second(s)?|sec|s)/,'');
           }
           
+          // separate the seconds minutes and hours of the string into separate array values
           let split = input.split(':');
+          // fill in '00' minutes if they are missing
           if(hasHours && !hasMinutes && hasSeconds){
             split[2]= split[1];
             split[1] = '00';
-          }else{
-
           }
+          // fill in '00' seconds if they are missing
           if(!hasSeconds){
             split[2] = 00;
           }
@@ -289,6 +300,6 @@
       // plays a short beeping noise
       function beep(){
         let audio = new Audio('beep.wav');
-        audio.volume = 0.3;
+        audio.volume = 0.2;
         audio.play();
       }
