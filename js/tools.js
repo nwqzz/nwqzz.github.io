@@ -4,12 +4,32 @@
       let isReset = '';   // stores the id of the timer that is beeing reset
       let numTimers = 2;  // stores the number of timer ids that are used up
 
+      window.onload = init;
+      
+      function init() {
+        addButton(1);
+        addButton(2);
+      }
+
       function start(timer) {
         
-        // display reset button and remove button
-        let resetAndRemoveButtons = '<button onclick="reset('+ timer +')" class="resetButton"\'> reset </button>';
-        resetAndRemoveButtons += '<button class="removeButton" onclick="removeButton('+(timer)+')">🗙</button>';
-        document.getElementById('resetFrame'+timer).innerHTML =  resetAndRemoveButtons;
+        // display reset button 
+        let resetButton = document.createElement("button");
+        resetButton.innerHTML = "reset";
+        resetButton.classList.add("resetButton");
+        let resetOnclick = document.createAttribute("onclick");
+        resetOnclick.value = 'reset('+timer+')';
+        resetButton.setAttributeNode(resetOnclick);
+        document.getElementById('resetFrame'+timer).appendChild(resetButton);
+
+        // display remove button
+        let removeButton = document.createElement("button");
+        removeButton.innerHTML = '🗙';
+        removeButton.classList.add("removeButton");
+        let removeOnclick = document.createAttribute("onclick");
+        removeOnclick.value = 'removeButton('+(timer)+')';
+        removeButton.setAttributeNode(removeOnclick);
+        document.getElementById('resetFrame'+timer).appendChild(removeButton);
 
         // read the relevant input field
         let input = document.getElementById("timerInput"+timer).value;
@@ -95,7 +115,7 @@
             return;
           }
 
-
+          
           document.getElementById("timer"+timer).innerHTML = (countDownText);
 
           // calculate and set the  bar width
