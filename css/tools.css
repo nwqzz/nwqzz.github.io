@@ -8,7 +8,7 @@
     color: white;
   }
 
-  .timerEnd, .timerSpan {
+  .textInput, .pickerInput {
     border-style: solid;
     border-color: #999;
     margin: 3px;

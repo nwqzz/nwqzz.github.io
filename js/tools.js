@@ -1,38 +1,32 @@
-      // add timer Object make all statuses and methods object dependent
-      
       let stop = '';      // stores the id of the timer that is beeing stopped
       let isReset = '';   // stores the id of the timer that is beeing reset
-      let numTimers = 2;  // stores the number of timer ids that are used up
+      let numTimers = 0;  // stores the number of timer ids that are used up
 
       window.onload = init;
       
       function init() {
-        addButton(1);
-        addButton(2);
+        createTimer(-1,1,-1);
+        createTimer(-1,2,-1);
       }
 
       function start(timer) {
         
-        // display reset button 
-        let resetButton = document.createElement("button");
-        resetButton.innerHTML = "reset";
-        resetButton.classList.add("resetButton");
-        let resetOnclick = document.createAttribute("onclick");
-        resetOnclick.value = 'reset('+timer+')';
-        resetButton.setAttributeNode(resetOnclick);
+        // generate reset button 
+        let resetButton = document.createElement('button');
+        resetButton.innerHTML = 'reset';
+        resetButton.classList.add('resetButton');
+        resetButton.setAttribute('onclick','reset('+timer+')');        
         document.getElementById('resetFrame'+timer).appendChild(resetButton);
 
-        // display remove button
-        let removeButton = document.createElement("button");
+        // generate remove button
+        let removeButton = document.createElement('button');
         removeButton.innerHTML = '🗙';
-        removeButton.classList.add("removeButton");
-        let removeOnclick = document.createAttribute("onclick");
-        removeOnclick.value = 'removeButton('+(timer)+')';
-        removeButton.setAttributeNode(removeOnclick);
+        removeButton.classList.add('removeButton');
+        removeButton.setAttribute('onclick', 'removeButton('+timer+')');        
         document.getElementById('resetFrame'+timer).appendChild(removeButton);
 
         // read the relevant input field
-        let input = document.getElementById("timerInput"+timer).value;
+        let input = document.getElementById('timerInput'+timer).value;
 
         let timeSpan = parse(input); 
         let startTime = new Date();
@@ -47,20 +41,13 @@
             clearInterval(x);
           }
 
-          // reset the given timerSpan or timerEnd divs of a specified timer
-          if(isReset == timer && document.getElementById("timer"+timer)){
-            if(document.getElementById("timer"+timer).parentNode.className == 'timerSpan'){
-              resetHtml = '<input type="text" id="timerInput'+timer+'" value="'+input+'"><button onclick="start('+timer+')"> start </button>'; 
-            }else{
-              resetHtml = '<input type="datetime-local" id="timerInput'+ timer +'"><button onclick="start('+timer+')"> start </button>';
-            }
-            resetHtml += '<button class="removeButton" onclick="removeButton('+(timer)+')">🗙</button>';
-            document.getElementById("timer"+timer).innerHTML = resetHtml;
+
+          // reset the timer if the isReset variable is set to reset that timer
+          if(isReset == timer && document.getElementById('timer'+timer)){
             
-            // reset progressbar and remove reset button
-            document.getElementById("progressBar"+timer).classList.remove("flashing");
-            document.getElementById("progressBar"+timer).style.width = 0;
-            document.getElementById("resetFrame"+timer).innerHTML = '';
+            // copy a new timer over the old one
+            createTimer(timer,-1,input);
+
             
             // clear stop and reset variables and exit the inteval function
             stop = '';
@@ -74,7 +61,7 @@
           // animate the progressbar and play an alarm tone when the timer has finished
           if(countDown<0){
             if(!timerEnded){
-              document.getElementById("progressBar"+timer).classList.add("flashing");
+              document.getElementById('progressBar'+timer).classList.add('flashing');
               beep();
               setTimeout(beep,500);
               setTimeout(beep,1000);
@@ -111,16 +98,16 @@
 
           // changed output if timer has run out
           if(timerEnded){
-            document.getElementById("timer"+timer).innerHTML = 'Timer ended '+countDownText+' ago! ';
+            document.getElementById('timer'+timer).innerHTML = 'Timer ended '+countDownText+' ago! ';
             return;
           }
 
           
-          document.getElementById("timer"+timer).innerHTML = (countDownText);
+          document.getElementById('timer'+timer).innerHTML = countDownText;
 
           // calculate and set the  bar width
-          let progressBarWidth = ((now.getTime() - startTime.getTime())/(timeSpan)*100).toFixed(2)*.99+ "%"
-          document.getElementById("progressBar"+timer).style.width = progressBarWidth;
+          let progressBarWidth = ((now.getTime() - startTime.getTime())/(timeSpan)*100).toFixed(2)*.99+ '%'
+          document.getElementById('progressBar'+timer).style.width = progressBarWidth;
         
         }, 10);
       }
@@ -278,36 +265,95 @@
         isReset = timer;
       }
 
-      // adds a new timer element below the last timer of its kind
-      function addButton(spanOrEnd){ // The parameter spanOrEnd specifies whether the first (timespan) or second (endtime) add button was pressed
+      // adds a new timer element below the last timer of its kind //TODO replace this method
+      function addButton(inputType){ // The parameter spanOrEnd specifies whether the first (timespan) or second (endtime) add button was pressed
 
-        let newTimer = ''
-        
-        let timerDiv = document.createElement("div");
-        if(spanOrEnd == 1){
-          timerDiv.classList.add("timerSpan");
-        }else{
-          timerDiv.classList.add("timerEnd");
+        createTimer(-1,inputType,-1);
+        return;
+      }
+
+      /* creates a new timer or writes over an existing timer
+       *
+       * timer: specifies which timer to write over; -1 means a new timer is created
+       * inputType: specefies wether text or picker input is used (can be set to -1 if an existing timer is specified)
+       * input: default input value in case of a text input (can be set to -1 if not used)
+       *  
+       */
+      function createTimer(timer, inputType, input){
+
+        let timerContainer = document.createElement('div');
+
+        // if timer is -1 then a new timer container with timer, reset frame and progressbar is created
+        if(timer<0){
+          if(inputType == 1){
+            timerContainer.classList.add('textInput');
+            input = '1 minute 10 seconds';
+            let addButtonNode = document.getElementById('addButton1');
+            addButtonNode.parentNode.insertBefore(timerContainer,addButtonNode);
+          }else{
+            timerContainer.classList.add('pickerInput');
+            let addButtonNode = document.getElementById('addButton2');
+            addButtonNode.parentNode.insertBefore(timerContainer,addButtonNode);
+          }
+          timer = numTimers+1;
+          numTimers++;
+
+          let timerSpan = document.createElement('span');
+          timerSpan.setAttribute('id', 'timer'+(timer));
+          timerContainer.appendChild(timerSpan);
+
+          let resetFrame = document.createElement('span');
+          resetFrame.setAttribute('id', 'resetFrame'+(timer));
+          timerContainer.appendChild(resetFrame);
+
+          let progressBar = document.createElement('div');
+          progressBar.setAttribute('id', 'progressBar'+(timer));
+          progressBar.classList.add('progressBar');
+          timerContainer.appendChild(progressBar);
+
+          
+
         }
 
-        newTimer += '<span id=timer'+(numTimers+1)+'>';
-        if(spanOrEnd == 1){
-          newTimer += '<input type="text" id="timerInput'+(numTimers+1)+'" value="1 minute 10 seconds">'  
-        }else{
-          newTimer += '<input type="datetime-local" id="timerInput'+(numTimers+1)+'">';
+        timerSpan = document.getElementById('timer'+timer);
         
+        timerSpan.innerHTML = '';
+        document.getElementById('resetFrame'+timer).innerHTML = ''
+        
+        let resetInput = document.createElement('input');
+        resetInput.id = 'timerInput'+timer;
+
+        // reset input field in case of a time span timer
+        if(document.getElementById('timer'+timer).parentNode.className == 'textInput'){
+        
+          resetInput.setAttribute('type', 'text');
+          resetInput.setAttribute('value', input);
+        
+         // reset the input field in case of a time an date picker
+        }else{
+          resetInput.setAttribute('type', 'datetime-local');
         }
-        newTimer += '<button onclick="start('+(numTimers+1)+')"> start </button>';
-        newTimer += '<button class="removeButton" onclick="removeButton('+(numTimers+1)+')">🗙</button>'
-        newTimer += '</span>';
-        newTimer += '<span id="resetFrame'+(numTimers+1)+'"></span>';
-        newTimer += '<div class="progressBar" id="progressBar'+(numTimers+1)+'"></div>';
-        newTimer += '</div>';
 
-        timerDiv.innerHTML = newTimer;
-        document.getElementById('addButton'+spanOrEnd).before(timerDiv);
+        timerSpan.appendChild(resetInput);
 
-        numTimers++;
+        // generate a start Button
+        let resetStartButton = document.createElement('button');
+        resetStartButton.innerHTML = 'start';
+        resetStartButton.setAttribute('onclick', 'start('+timer+')');
+        timerSpan.appendChild(resetStartButton);
+
+        // generate a remove Button
+        let resetRemoveButton = document.createElement('button');
+        resetRemoveButton.innerHTML = '🗙';
+        resetRemoveButton.classList.add('removeButton');
+        resetRemoveButton.setAttribute('onclick', 'removeButton('+timer+')');
+        timerSpan.appendChild(resetRemoveButton);
+        
+        // reset progressbar and remove reset button
+        document.getElementById('progressBar'+timer).classList.remove('flashing');
+        document.getElementById('progressBar'+timer).style.width = 0;
+        document.getElementById('resetFrame'+timer).innerHTML = '';
+ 
       }
 
       // removes the timer with the specified number 
