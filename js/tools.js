@@ -18,13 +18,6 @@
         resetButton.setAttribute('onclick','reset('+timer+')');        
         document.getElementById('resetFrame'+timer).appendChild(resetButton);
 
-        // generate remove button
-        let removeButton = document.createElement('button');
-        removeButton.innerHTML = '🗙';
-        removeButton.classList.add('removeButton');
-        removeButton.setAttribute('onclick', 'removeButton('+timer+')');        
-        document.getElementById('resetFrame'+timer).appendChild(removeButton);
-
         // read the relevant input field
         let input = document.getElementById('timerInput'+timer).value;
 
