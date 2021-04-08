@@ -14,6 +14,19 @@
     margin: 3px;
     padding: 10px;
   }
+
+  .title {
+    font-size: 14pt;
+    font-weight: 500;
+    margin-bottom: 8px; 
+    width: 30ch;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+  }
+
+  
   
   .progressBar {
     background-color: #599;
@@ -36,7 +49,7 @@
   }
 
   p {
-    margin: 15px;
+    margin: 0px;
   }
 
   h4 {
@@ -48,6 +61,7 @@
     background-color: #599;
     border: none;
     color: white;
+    margin-left: 3px;
     padding: 3px 15px; 
   }
 
@@ -63,12 +77,20 @@
     background-color: rgba(0,0,0,0);
     float:right;
     outline: none;
-    padding: 0,0;
-    margin: -12px -5px;
-    padding: 0px 0px;
+    margin-right: -15px;
+    margin-top: -112px;
 
   }
 
   .resetButton {
     float: left;
+  }
+
+  .left {
+    width: 45%;
+  }
+
+  .right {
+
+    width: 45%;
   }

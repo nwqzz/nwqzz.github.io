@@ -298,6 +298,14 @@
           timer = numTimers+1;
           numTimers++;
 
+          let titleDiv = document.createElement('div');
+          titleDiv.classList.add('title');
+          let titleText = document.createElement('p');
+          titleText.innerHTML = 'click to enter a title';
+          titleText.setAttribute('contenteditable', 'true');
+          titleDiv.appendChild(titleText);
+          timerContainer.appendChild(titleDiv);
+
           let timerSpan = document.createElement('span');
           timerSpan.setAttribute('id', 'timer'+(timer));
           timerContainer.appendChild(timerSpan);
@@ -314,6 +322,13 @@
           
 
         }
+
+        // generate a remove Button
+        let resetRemoveButton = document.createElement('button');
+        resetRemoveButton.innerHTML = '🗙';
+        resetRemoveButton.classList.add('removeButton');
+        resetRemoveButton.setAttribute('onclick', 'removeButton('+timer+')');
+        timerContainer.appendChild(resetRemoveButton);
 
         timerSpan = document.getElementById('timer'+timer);
         
@@ -341,13 +356,6 @@
         resetStartButton.innerHTML = 'start';
         resetStartButton.setAttribute('onclick', 'start('+timer+')');
         timerSpan.appendChild(resetStartButton);
-
-        // generate a remove Button
-        let resetRemoveButton = document.createElement('button');
-        resetRemoveButton.innerHTML = '🗙';
-        resetRemoveButton.classList.add('removeButton');
-        resetRemoveButton.setAttribute('onclick', 'removeButton('+timer+')');
-        timerSpan.appendChild(resetRemoveButton);
         
         // reset progressbar and remove reset button
         document.getElementById('progressBar'+timer).classList.remove('flashing');
