@@ -15,16 +15,22 @@
     padding: 10px;
   }
 
+  .timerContainer {
+    position: relative;
+  }
+
   .title {
-    font-size: 14pt;
+    height: 1em;
+    font-size: 12pt;
+    color: #fff;
     font-weight: 500;
     margin-bottom: 8px; 
-    width: 30ch;
-    float: left;
-    white-space: nowrap;
+    width: 50ch;
+    white-space: pre-wrap;
     overflow: hidden;
     text-overflow: ellipsis;
-
+    text-align: left;
+    margin-left: 2em;
   }
 
   
@@ -79,7 +85,7 @@
     float:right;
     outline: none;
     margin-right: -15px;
-    margin-top: -80px;
+    margin-top: -105px;
 
   }
 

@@ -26,6 +26,8 @@
         let endTime = new Date(startTime.getTime()+timeSpan) ;
         let timerEnded = false;
 
+        let name = document.getElementById('title'+timer).innerHTML;
+        document.cookie = timer+'= '+name+', '+startTime+', '+endTime;
 
         let x = setInterval(function(){
 
@@ -268,7 +270,7 @@
       /* creates a new timer or writes over an existing timer
        *
        * timer: specifies which timer to write over; -1 means a new timer is created
-       * inputType: specefies wether text or picker input is used (can be set to -1 if an existing timer is specified)
+       * inputType: specifies wether text or picker input is used (can be set to -1 if an existing timer is specified)
        * input: default input value in case of a text input (can be set to -1 if not used)
        *  
        */
@@ -294,6 +296,7 @@
           let titleDiv = document.createElement('div');
           titleDiv.classList.add('title');
           let titleText = document.createElement('p');
+          titleText.id = 'title'+timer;
           titleText.innerHTML = 'click to enter a title';
           titleText.setAttribute('contenteditable', 'true');
           titleDiv.appendChild(titleText);
@@ -360,6 +363,7 @@
       // removes the timer with the specified number 
       function removeButton(timer){
         reset(timer);
+        document.cookie = timer+'; expires=Thu, 01 Jan 1970 00:00:00 UTC;'
         let timerDiv = document.getElementById('timer'+timer).parentNode;
         timerDiv.remove();
       }
