@@ -5,29 +5,68 @@
       window.onload = init;
       
       function init() {
-        createTimer(-1,1,-1);
-        createTimer(-1,2,-1);
+        let cookieTimers = document.cookie.split(';');
+        cookieTimers.forEach((element) => {
+          element = element.trim();
+          if(!element){
+            createTimer(-1,1,-1);
+            createTimer(-1,2,-1);
+            return;
+          }
+          let args = element.split(',');
+          let timer = args[0].split('=');
+          let id = timer[0];
+          let title = timer[1];
+          if(numTimers < id){
+            numTimers = Number(id+1);
+          }
+          restart(id,title,args[1],args[2],args[3]);
+        });
       }
 
-      function start(timer) {
+      function restart(timer, title, type, startTime, endTime){
+        if(type == 'textInput'){
+          type = 1;
+        }
+        if(type == 'pickerInput'){
+          type = 2;
+        }
+        createTimer(timer, type, '');
+        document.getElementById('title'+timer).innerHTML = title;
+        start(timer, startTime, endTime);
+      }
+
+      function start(timer, startTime, endTime) {
         
         // generate reset button 
         let resetButton = document.createElement('button');
         resetButton.innerHTML = 'reset';
         resetButton.classList.add('resetButton');
-        resetButton.setAttribute('onclick','reset('+timer+')');        
+        resetButton.setAttribute('onclick','reset('+timer+')');
         document.getElementById('resetFrame'+timer).appendChild(resetButton);
 
         // read the relevant input field
         let input = document.getElementById('timerInput'+timer).value;
 
-        let timeSpan = parse(input); 
-        let startTime = new Date();
-        let endTime = new Date(startTime.getTime()+timeSpan) ;
+        // compute timespan if start and end are known (from cookie)
+        let timeSpan;
+        if(startTime && endTime){
+          startTime = new Date(startTime);
+          endTime = new Date(endTime);
+          timeSpan = endTime - startTime;
+        }else{
+          // compute timespan from input
+          timeSpan = parse(input);
+          startTime = new Date();
+          endTime = new Date(startTime.getTime()+timeSpan);
+        }
+        
         let timerEnded = false;
 
         let name = document.getElementById('title'+timer).innerHTML;
-        document.cookie = timer+'= '+name+', '+startTime+', '+endTime;
+        let type = document.getElementById('timer'+timer).parentNode.className;
+        document.cookie = timer+'= '+name+','+type+','+startTime+', '+endTime;
+
 
         let x = setInterval(function(){
 
@@ -258,6 +297,7 @@
       function reset(timer){
         stop = timer;
         isReset = timer;
+        document.cookie = timer+'=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
       }
 
       // adds a new timer element below the last timer of its kind //TODO replace this method
@@ -278,8 +318,8 @@
 
         let timerContainer = document.createElement('div');
 
-        // if timer is -1 then a new timer container with timer, reset frame and progressbar is created
-        if(timer<0){
+        // if timer id is not in use then a new timer container with timer, reset frame and progressbar is created
+        if(!document.getElementById('timer'+timer)){
           if(inputType == 1){
             timerContainer.classList.add('textInput');
             input = '1 minute 10 seconds';
@@ -290,9 +330,11 @@
             let addButtonNode = document.getElementById('addButton2');
             addButtonNode.parentNode.insertBefore(timerContainer,addButtonNode);
           }
-          timer = numTimers+1;
-          numTimers++;
 
+          if(timer == -1){
+            numTimers++;      
+            timer = numTimers;
+          }
           let titleDiv = document.createElement('div');
           titleDiv.classList.add('title');
           let titleText = document.createElement('p');
