@@ -5,9 +5,13 @@
       window.onload = init;
       
       function init() {
+
+        // read cookies and restart any timers that have not been reset or closed
         let cookieTimers = document.cookie.split(';');
         cookieTimers.forEach((element) => {
           element = element.trim();
+
+          // if the cookies are empty generate two default timers
           if(!element){
             createTimer(-1,1,-1);
             createTimer(-1,2,-1);
@@ -24,6 +28,7 @@
         });
       }
 
+      // create and start a timer with the specified values
       function restart(timer, title, type, startTime, endTime){
         if(type == 'textInput'){
           type = 1;
@@ -297,10 +302,12 @@
       function reset(timer){
         stop = timer;
         isReset = timer;
+
+        // delete the timer from the cookie
         document.cookie = timer+'=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
       }
 
-      // adds a new timer element below the last timer of its kind //TODO replace this method
+      // adds a new timer element below the last timer of its kind
       function addButton(inputType){ // The parameter spanOrEnd specifies whether the first (timespan) or second (endtime) add button was pressed
 
         createTimer(-1,inputType,-1);
@@ -331,10 +338,13 @@
             addButtonNode.parentNode.insertBefore(timerContainer,addButtonNode);
           }
 
+          // generate a new id if necessary
           if(timer == -1){
             numTimers++;      
             timer = numTimers;
           }
+
+          // add title
           let titleDiv = document.createElement('div');
           titleDiv.classList.add('title');
           let titleText = document.createElement('p');
@@ -344,14 +354,17 @@
           titleDiv.appendChild(titleText);
           timerContainer.appendChild(titleDiv);
 
+          // add a span with a unique id for the new timer
           let timerSpan = document.createElement('span');
           timerSpan.setAttribute('id', 'timer'+(timer));
           timerContainer.appendChild(timerSpan);
 
+          // add a span for the reset button
           let resetFrame = document.createElement('span');
           resetFrame.setAttribute('id', 'resetFrame'+(timer));
           timerContainer.appendChild(resetFrame);
 
+          // add a progress bar
           let progressBar = document.createElement('div');
           progressBar.setAttribute('id', 'progressBar'+(timer));
           progressBar.classList.add('progressBar');
